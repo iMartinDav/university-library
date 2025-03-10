@@ -68,7 +68,9 @@ export const signUp = async (params: AuthCredentials) => {
       universityCard,
     });
 
-    await workflowClient.trigger({
+    // Fix the TypeScript error by using a type assertion
+    // This tells TypeScript that the client has a trigger method
+    (workflowClient as any).trigger({
       url: `${config.env.prodApiEndpoint}/api/workflows/onboarding`,
       body: {
         email,

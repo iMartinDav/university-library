@@ -16,22 +16,29 @@ const {
 
 const authenticator = async () => {
   try {
-    const response = await fetch(`${config.env.apiEndpoint}/api/auth/imagekit`);
+    // Use a direct path to avoid concatenation issues
+    const response = await fetch("/api/auth/imagekit");
 
     if (!response.ok) {
       const errorText = await response.text();
-
       throw new Error(
         `Request failed with status ${response.status}: ${errorText}`,
       );
     }
 
     const data = await response.json();
-
-    const { signature, expire, token } = data;
-
-    return { token, expire, signature };
+    
+    // Log the authentication data for debugging
+    console.log("Auth data from server:", data);
+    
+    // Make sure we're returning exactly what ImageKit expects
+    return {
+      token: data.token,
+      expire: data.expire,
+      signature: data.signature
+    };
   } catch (error: any) {
+    console.error("ImageKit authentication error:", error);
     throw new Error(`Authentication request failed: ${error.message}`);
   }
 };
@@ -175,14 +182,14 @@ const FileUpload = ({
       {file &&
         (type === "image" ? (
           <IKImage
-            alt={file.filePath}
-            path={file.filePath}
+            alt={file.filePath || ""}
+            path={file.filePath || ""}
             width={500}
             height={300}
           />
         ) : type === "video" ? (
           <IKVideo
-            path={file.filePath}
+            path={file.filePath || undefined}
             controls={true}
             className="h-96 w-full rounded-xl"
           />
