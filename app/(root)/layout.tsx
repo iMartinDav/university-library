@@ -21,6 +21,9 @@ const Layout = async ({ children }: { children: ReactNode }) => {
       .where(eq(users.id, session?.user?.id))
       .limit(1);
 
+    // Check if user exists before accessing properties
+    if (user.length === 0) return;
+    
     if (user[0].lastActivityDate === new Date().toISOString().slice(0, 10))
       return;
 
